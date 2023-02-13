@@ -29,7 +29,7 @@ pars <- spec_rescomp(
                     ncol = 1,
                     byrow = TRUE),  
   resspeed = 0.03, 
-  resconc = 0.2,
+  resconc = 0.5,
   totaltime = 500)
 
 m1 <- sim_rescomp(pars)
@@ -61,3 +61,25 @@ plot_rescomp(m1) + theme(text=element_text(size=20),
                          axis.text = element_text(size = 10),
                          legend.text = element_text(size = 10),
                          legend.position = "bottom")
+
+# Two consumers, two resources 
+pars <- spec_rescomp(
+  spnum = 2, 
+  resnum = 2,
+  funcresp = "type2",
+  mumatrix = matrix(c(0.09,0.04,
+                      0.05,0.08), 
+                    nrow = 2, 
+                    ncol = 2,
+                    byrow = TRUE),
+  resspeed = 0.03,
+  resconc = 1,
+  mort = 0.03,
+  essential = FALSE,
+  totaltime = 1000
+)
+
+plot_funcresp(pars, maxx = 0.2)
+
+m1 <- sim_rescomp(pars)
+plot_rescomp(m1)

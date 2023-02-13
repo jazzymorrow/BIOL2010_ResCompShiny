@@ -28,12 +28,12 @@ ui <- fluidPage(
                  sliderInput("mu",
                              "Maximum growth rate:",
                              min = 0.01,
-                             max = 2,
+                             max = 1,
                              value = 0.2),
                  sliderInput("resconc",
                              "Resource concentration:",
-                             min = 0.2,
-                             max = 2,
+                             min = 0.1,
+                             max = 1,
                              value = 0.5)),
                # Specify rescomp graph to use 
                mainPanel(
@@ -44,21 +44,21 @@ ui <- fluidPage(
              # Sidebar with a slider inputs 
              sidebarLayout(
                sidebarPanel(
-                 sliderInput("mu1",
+                 sliderInput("mu21", #mu for panel 2, species 1
                              "Sp1 Maximum growth rate:",
                              min = 0.01,
-                             max = 2,
+                             max = 1,
                              value = 0.05),
-                 sliderInput("mu2",
+                 sliderInput("mu22",
                              "Sp2 Maximum growth rate:",
                              min = 0.01,
-                             max = 2,
+                             max = 1,
                              value = 0.2),
-                 sliderInput("resconc",
+                 sliderInput("resconc2",
                              "Resource concentration:",
-                             min = 0.2,
-                             max = 2,
-                             value = 0.2)),
+                             min = 0.1,
+                             max = 1,
+                             value = 0.5)),
              mainPanel(
                plotOutput("TwoConOneRes"))
         )),
@@ -67,15 +67,15 @@ ui <- fluidPage(
              # Sidebar with a slider inputs 
              sidebarLayout(
                sidebarPanel(
-                 sliderInput("mu1",
+                 sliderInput("mu31", #mu for panel 3, species 1
                              "Sp1 Maximum growth rate:",
                              min = 0.01,
-                             max = 2,
+                             max = 1,
                              value = 0.2),
-                 sliderInput("mu2",
+                 sliderInput("mu32",
                              "Sp2 Maximum growth rate:",
                              min = 0.01,
-                             max = 2,
+                             max = 1,
                              value = 0.1),
                  sliderInput("pulsefreq",
                              "Pulse frequency:",
@@ -85,9 +85,50 @@ ui <- fluidPage(
                # Specify rescomp graph to use 
                mainPanel(
                  plotOutput("TwoConOnePulRes"))
-        ))
-  )
-)
+        )),
+    # PANEL 4: 2 CONS 2 RES
+    tabPanel(title = "Two Consumers, Two Resources", 
+             # Sidebar with a slider inputs 
+             sidebarLayout(
+               sidebarPanel(
+                 sliderInput("mu41A",
+                             "Sp1 Maximum growth rate:",
+                             min = 0.01,
+                             max = 1,
+                             value = 0.05),
+                 sliderInput("mu41B",
+                             "Sp1 Maximum growth rate:",
+                             min = 0.01,
+                             max = 1,
+                             value = 0.05),
+                 sliderInput("mu42A",
+                             "Sp2 Maximum growth rate:",
+                             min = 0.01,
+                             max = 1,
+                             value = 0.2),
+                 sliderInput("mu42B",
+                             "Sp1 Maximum growth rate:",
+                             min = 0.01,
+                             max = 1,
+                             value = 0.05),
+                 sliderInput("resconc4",
+                             "Resource concentrations:",
+                             min = 0.2,
+                             max = 2,
+                             value = 0.2),
+                 # sliderInput("resconcB",
+                 #             "Resource B concentration:",
+                 #             min = 0.2,
+                 #             max = 2,
+                 #             value = 0.2)
+                 ),
+             mainPanel(
+               fluidRow(
+                 column(12,plotOutput("FuncResp"))),
+               fluidRow(
+                 column(12,plotOutput("TwoConTwoRes")))
+             ))
+  )))
 
 #---------------------------------------------------
                 # Define server logic 
@@ -120,14 +161,16 @@ server <- function(input, output) {
         spnum = 2, 
         resnum = 1,
         funcresp = "type2",
-        mumatrix = matrix(c(input$mu1,input$mu2), 
+        mumatrix = matrix(c(input$mu21,input$mu22), 
                           nrow = 2, 
                           ncol = 1,
                           byrow = TRUE),  
         resspeed = 0.03, 
-        resconc = input$resconc,
+        resconc = input$resconc2,
         totaltime = 500)
+      
       m1 <- sim_rescomp(pars)
+      
       plot_rescomp(m1) + theme(text = element_text(size=22),
                                axis.title = element_text(size = 18),
                                axis.text = element_text(size = 15),
@@ -141,7 +184,7 @@ server <- function(input, output) {
         spnum = 2, 
         resnum = 1,
         funcresp = "type2",
-        mumatrix = matrix(c(input$mu1,input$mu2), 
+        mumatrix = matrix(c(input$mu31,input$mu32), 
                           nrow = 2, 
                           ncol = 1,
                           byrow = TRUE),
@@ -160,6 +203,56 @@ server <- function(input, output) {
                                axis.text = element_text(size = 15),
                                legend.text = element_text(size = 18),
                                legend.position = "bottom")
+    })
+    
+    ## Two consumers, two resources
+    output$FuncResp <- renderPlot({
+      pars <- spec_rescomp(
+        spnum = 2, 
+        resnum = 2,
+        funcresp = "type2",
+        mumatrix = matrix(c(input$mu41A,input$mu41B,
+                            input$mu42A, input$mu42B), 
+                          nrow = 2, 
+                          ncol = 2,
+                          byrow = TRUE),
+        resspeed = 0.03,
+        resconc = input$resconc4, #both resources have same concentration??
+        mort = 0.03,
+        essential = FALSE,
+        totaltime = 500)
+      plot_funcresp(pars, maxx = 0.2) + 
+        theme(text = element_text(size = 22),
+              axis.title = element_text(size = 18),
+              axis.text = element_text(size = 15),
+              legend.text = element_text(size = 18),
+              legend.position = "bottom")
+    })
+    
+    output$TwoConTwoRes <- renderPlot({
+    pars <- spec_rescomp(
+      spnum = 2, 
+      resnum = 2,
+      funcresp = "type2",
+      mumatrix = matrix(c(input$mu41A,input$mu41B,
+                          input$mu42A, input$mu42B), 
+                        nrow = 2, 
+                        ncol = 2,
+                        byrow = TRUE),
+      resspeed = 0.03,
+      resconc = input$resconc4, #both resources have same concentration??
+      mort = 0.03,
+      essential = FALSE,
+      totaltime = 500)
+    
+    m1 <- sim_rescomp(pars)
+    
+    plot_rescomp(m1) + 
+      theme(text = element_text(size = 22),
+            axis.title = element_text(size = 18),
+            axis.text = element_text(size = 15),
+            legend.text = element_text(size = 18),
+            legend.position = "bottom")
     })
      
 }
