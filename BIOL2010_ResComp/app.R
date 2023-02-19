@@ -24,7 +24,7 @@ ui <- fluidPage(
     tabPanel(title = "One Consumer, One Resource", fluid = TRUE,
              # Sidebar with a slider inputs 
              sidebarLayout(
-               sidebarPanel(
+               sidebarPanel(width = 3,
                  sliderInput("mu",
                              "Maximum growth rate:",
                              min = 0.01,
@@ -37,13 +37,13 @@ ui <- fluidPage(
                              value = 0.5)),
                # Specify rescomp graph to use 
                mainPanel(
-                 plotOutput("OneConOneRes"))
+                 plotOutput("OneConOneRes", width = "90%"))
              )),
     # PANEL 2: 2 CONS 1 RES
     tabPanel(title = "Two Consumers, One Resource", fluid = TRUE,
              # Sidebar with a slider inputs 
              sidebarLayout(
-               sidebarPanel(
+               sidebarPanel(width = 3,
                  sliderInput("mu21", #mu for panel 2, species 1
                              "Sp1 Maximum growth rate:",
                              min = 0.01,
@@ -66,7 +66,7 @@ ui <- fluidPage(
     tabPanel(title = "Two Consumers, One Pulsed Resource", fluid = TRUE,
              # Sidebar with a slider inputs 
              sidebarLayout(
-               sidebarPanel(
+               sidebarPanel(width = 3,
                  sliderInput("mu31", #mu for panel 3, species 1
                              "Sp1 Maximum growth rate:",
                              min = 0.01,
@@ -90,7 +90,7 @@ ui <- fluidPage(
     tabPanel(title = "Two Consumers, Two Resources", 
              # Sidebar with a slider inputs 
              sidebarLayout(
-               sidebarPanel(
+               sidebarPanel(width = 3,
                  sliderInput("mu41A",
                              "Sp1 Maximum growth rate:",
                              min = 0.01,
@@ -107,7 +107,7 @@ ui <- fluidPage(
                              max = 1,
                              value = 0.2),
                  sliderInput("mu42B",
-                             "Sp1 Maximum growth rate:",
+                             "Sp2 Maximum growth rate:",
                              min = 0.01,
                              max = 1,
                              value = 0.05),
@@ -122,10 +122,12 @@ ui <- fluidPage(
                  #             max = 2,
                  #             value = 0.2)
                  ),
-             mainPanel(
-               fluidRow(
-                 column(12,plotOutput("FuncResp"))),
-               fluidRow(
+             mainPanel(h4("Functional response"),
+               fluidRow(column(12,align = "center",
+                        plotOutput("FuncResp", 
+                                      width = "80%", height = "300px"))),
+               h4("Plotting through time"),
+               fluidRow(align = "center",
                  column(12,plotOutput("TwoConTwoRes")))
              ))
   )))
@@ -221,7 +223,7 @@ server <- function(input, output) {
         mort = 0.03,
         essential = FALSE,
         totaltime = 500)
-      plot_funcresp(pars, maxx = 0.2) + 
+      plot_funcresp(pars, maxx = 0.3) + 
         theme(text = element_text(size = 22),
               axis.title = element_text(size = 18),
               axis.text = element_text(size = 15),

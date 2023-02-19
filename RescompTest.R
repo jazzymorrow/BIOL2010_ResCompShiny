@@ -83,3 +83,6 @@ plot_funcresp(pars, maxx = 0.2)
 
 m1 <- sim_rescomp(pars)
 plot_rescomp(m1)
+
+
+## CHRISTINAS GITHUB FOR SHINY
