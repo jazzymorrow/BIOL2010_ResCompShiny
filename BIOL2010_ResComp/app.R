@@ -10,17 +10,12 @@ library(shiny)
 library(rescomp)
 library(ggplot2)
 
-#--------------------------------------------------
-          # Define UI for application 
-#--------------------------------------------------
-ui <- fluidPage(
-  
-  # Application title
-  titlePanel("Modelling Resource Competition"),
-  
-  tabsetPanel(
+#-----------------------------------------------------------
+                # Define UI for application 
+#-----------------------------------------------------------
+ui <- navbarPage("Modelling Resource Competition",
     
-    # PANEL 1: 1 CONS 1 RES
+    ### PANEL 1: 1 CONS 1 RES
     tabPanel(title = "One Consumer, One Resource", fluid = TRUE,
              # Sidebar with a slider inputs 
              sidebarLayout(
@@ -36,11 +31,16 @@ ui <- fluidPage(
                              max = 1,
                              value = 0.5)),
                # Specify rescomp graph to use 
-               mainPanel(
+               mainPanel(h3("Population and resources through time"),
                  plotOutput("OneConOneRes", width = "90%"))
              )),
-    # PANEL 2: 2 CONS 1 RES
-    tabPanel(title = "Two Consumers, One Resource", fluid = TRUE,
+    
+    
+    ### 2 CONS 1 RES
+    # navbar menu to give drop-down options for cts or pulsed resourse 
+    navbarMenu("Two Consumers, One Resource",
+    ### PANEL 2A: 2 CONS 1 RES CTS
+    tabPanel(title = "Continuously Supplied Resource", fluid = TRUE,
              # Sidebar with a slider inputs 
              sidebarLayout(
                sidebarPanel(width = 3,
@@ -59,11 +59,12 @@ ui <- fluidPage(
                              min = 0.1,
                              max = 1,
                              value = 0.5)),
-             mainPanel(
+             mainPanel(h3("Population and resources through time"),
                plotOutput("TwoConOneRes"))
         )),
-    # PANEL 3: 2 CONS 1 PULSED RES
-    tabPanel(title = "Two Consumers, One Pulsed Resource", fluid = TRUE,
+    
+    ### PANEL 2B: 2 CONS 1 PULSED RES
+    tabPanel(title = "Pulsed Resource", fluid = TRUE,
              # Sidebar with a slider inputs 
              sidebarLayout(
                sidebarPanel(width = 3,
@@ -83,31 +84,45 @@ ui <- fluidPage(
                              max = 100,
                              value = 50)),
                # Specify rescomp graph to use 
-               mainPanel(
-                 plotOutput("TwoConOnePulRes"))
-        )),
-    # PANEL 4: 2 CONS 2 RES
+               mainPanel(h3("Functional response plot"),
+                         fluidRow(column(12,align = "center",
+                                         plotOutput("FuncResp3", 
+                                                    width = "70%", 
+                                                    height = "300px"))),
+                         h3("Population and resources through time"),
+                         fluidRow(column(12,align = "center",
+                                         plotOutput("TwoConOnePulRes", 
+                                                    width = "90%", 
+                                                    height = "300px"))))
+        ))),
+    
+    
+    ### PANEL 4: 2 CONS 2 RES
     tabPanel(title = "Two Consumers, Two Resources", 
              # Sidebar with a slider inputs 
              sidebarLayout(
                sidebarPanel(width = 3,
                  sliderInput("mu41A",
-                             "Sp1 Maximum growth rate:",
+                             "Maximum growth rate for 
+                             species 1 on resource A:",
                              min = 0.01,
                              max = 1,
                              value = 0.05),
                  sliderInput("mu41B",
-                             "Sp1 Maximum growth rate:",
+                             "Maximum growth rate for 
+                             species 1 on resource B:",
                              min = 0.01,
                              max = 1,
                              value = 0.05),
                  sliderInput("mu42A",
-                             "Sp2 Maximum growth rate:",
+                             "Maximum growth rate for 
+                             species 2 on resource A:",
                              min = 0.01,
                              max = 1,
                              value = 0.2),
                  sliderInput("mu42B",
-                             "Sp2 Maximum growth rate:",
+                             "Maximum growth rate for 
+                             species 2 on resource B:",
                              min = 0.01,
                              max = 1,
                              value = 0.05),
@@ -116,25 +131,27 @@ ui <- fluidPage(
                              min = 0.2,
                              max = 2,
                              value = 0.2),
-                 # sliderInput("resconcB",
-                 #             "Resource B concentration:",
-                 #             min = 0.2,
-                 #             max = 2,
-                 #             value = 0.2)
                  ),
-             mainPanel(h4("Functional response"),
+             mainPanel(h3("Functional response plots"),
+                       h5("This plot is used to identify R*. Use this 
+                          plot to determine the outcome: will species coexist,
+                          or will one species exclude the other?"),
                fluidRow(column(12,align = "center",
-                        plotOutput("FuncResp", 
-                                      width = "80%", height = "300px"))),
-               h4("Plotting through time"),
-               fluidRow(align = "center",
-                 column(12,plotOutput("TwoConTwoRes")))
+                        plotOutput("FuncResp4", 
+                                      width = "80%", 
+                                   height = "300px"))),
+               h3("Population and resources through time"),
+               fluidRow(column(12,align = "center",
+                               plotOutput("TwoConTwoRes")))
              ))
-  )))
+  ))
 
-#---------------------------------------------------
-                # Define server logic 
-#---------------------------------------------------
+
+
+
+#---------------------------------------------------------------------
+                       # Define server logic 
+#---------------------------------------------------------------------
 server <- function(input, output) {
   
     ## One consumer, one resource 
@@ -148,14 +165,17 @@ server <- function(input, output) {
         resspeed = 0.03,
         resconc = input$resconc,
         totaltime = 300)
+      
       m1 <- sim_rescomp(pars)
+      
+      # plot results through time 
       plot_rescomp(m1) + theme(text = element_text(size=22),
                                axis.title = element_text(size = 18),
                                axis.text = element_text(size = 15),
                                legend.text = element_text(size = 18),
                                legend.position = "bottom")
     })
-    
+#################################################
     ## Two consumers, one resource 
     output$TwoConOneRes <- renderPlot({
       #simulate based on input params from UI
@@ -173,13 +193,41 @@ server <- function(input, output) {
       
       m1 <- sim_rescomp(pars)
       
+      # plot results through time 
       plot_rescomp(m1) + theme(text = element_text(size=22),
                                axis.title = element_text(size = 18),
                                axis.text = element_text(size = 15),
                                legend.text = element_text(size = 18),
                                legend.position = "bottom")
     })
-    
+#################################################    
+    ## Two consumers, one pulsed resource 
+    output$FuncResp3 <- renderPlot({
+      pars <- spec_rescomp(
+        spnum = 2, 
+        resnum = 1,
+        funcresp = "type2",
+        mumatrix = matrix(c(input$mu31,input$mu32), 
+                          nrow = 2, 
+                          ncol = 1,
+                          byrow = TRUE),
+        kmatrix = matrix(c(2, 2), 
+                         nrow = 2, 
+                         ncol = 1, 
+                         byrow = TRUE),  
+        resspeed = 0, # set to zero for no additional resource supply 
+        resconc = 0.2,
+        respulse = 0.3,
+        pulsefreq = input$pulsefreq # resource pulse size
+        )
+      # plot functional responses 
+      plot_funcresp(pars, maxx = 1) + 
+        theme(text = element_text(size = 22),
+              axis.title = element_text(size = 18),
+              axis.text = element_text(size = 15),
+              legend.text = element_text(size = 18),
+              legend.position = "bottom")
+    })
     ## Two consumers, one pulsed resource 
     output$TwoConOnePulRes <- renderPlot({
       pars <- spec_rescomp(
@@ -190,7 +238,7 @@ server <- function(input, output) {
                           nrow = 2, 
                           ncol = 1,
                           byrow = TRUE),
-        kmatrix = matrix(c(2, 0.015), 
+        kmatrix = matrix(c(2, 2), 
                          nrow = 2, 
                          ncol = 1, 
                          byrow = TRUE),  
@@ -199,16 +247,19 @@ server <- function(input, output) {
         respulse = 0.3,
         pulsefreq = input$pulsefreq # resource pulse size
       )
+      
       m1 <- sim_rescomp(pars)
+      
+      # plot outcome through time 
       plot_rescomp(m1) + theme(text = element_text(size=22),
                                axis.title = element_text(size = 18),
                                axis.text = element_text(size = 15),
                                legend.text = element_text(size = 18),
                                legend.position = "bottom")
     })
-    
+#################################################    
     ## Two consumers, two resources
-    output$FuncResp <- renderPlot({
+    output$FuncResp4 <- renderPlot({
       pars <- spec_rescomp(
         spnum = 2, 
         resnum = 2,
@@ -223,13 +274,14 @@ server <- function(input, output) {
         mort = 0.03,
         essential = FALSE,
         totaltime = 500)
-      plot_funcresp(pars, maxx = 0.3) + 
+      plot_funcresp(pars, maxx = 1) + 
         theme(text = element_text(size = 22),
               axis.title = element_text(size = 18),
               axis.text = element_text(size = 15),
               legend.text = element_text(size = 18),
               legend.position = "bottom")
     })
+    
     
     output$TwoConTwoRes <- renderPlot({
     pars <- spec_rescomp(

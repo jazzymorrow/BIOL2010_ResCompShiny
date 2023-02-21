@@ -113,7 +113,7 @@ ggsave("Figures/FR_1Spec1Res.jpeg",
        width = 3, height = 3)
 
 
-# Two consumers, one continuously supplied resource 
+######### Two consumers, one continuously supplied resource ######
 pars <- spec_rescomp(
   spnum = 2, 
   resnum = 1,
@@ -137,7 +137,7 @@ plot_funcresp(pars, maxx = 2) + theme(legend.position = "bottom")
 ggsave("Figures/FR_2Spec1Res.jpeg",
        width = 3, height = 3)
 
-# Two consumers, one pulsed resource 
+######## Two consumers, one pulsed resource ##############
 pars <- spec_rescomp(
   spnum = 2, 
   resnum = 1,
