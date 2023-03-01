@@ -30,9 +30,18 @@ ui <- navbarPage("Modelling Resource Competition",
                              min = 0.1,
                              max = 1,
                              value = 0.5)),
-               # Specify rescomp graph to use 
-               mainPanel(h3("Population and resources through time"),
-                 plotOutput("OneConOneRes", width = "90%"))
+               
+               # figures to include on this panel 
+               mainPanel(h3("Functional response plots"),
+                 fluidRow(column(12,align = "center",
+                                         plotOutput("FuncResp1", 
+                                                    width = "70%", 
+                                                    height = "300px"))),
+                 h3("Population and resources through time"),
+                 fluidRow(column(12,align = "center",
+                                 plotOutput("OneConOneRes", 
+                                            width = "90%", 
+                                            height = "300px"))))
              )),
     
     
@@ -59,8 +68,18 @@ ui <- navbarPage("Modelling Resource Competition",
                              min = 0.1,
                              max = 1,
                              value = 0.5)),
-             mainPanel(h3("Population and resources through time"),
-               plotOutput("TwoConOneRes"))
+               
+               # figures to include on this panel
+             mainPanel(h3("Functional response plots"),
+                       fluidRow(column(12,align = "center",
+                                       plotOutput("FuncResp2", 
+                                                  width = "70%", 
+                                                  height = "300px"))),
+               h3("Population and resources through time"),
+               fluidRow(column(12,align = "center",
+                               plotOutput("TwoConOneRes", 
+                                          width = "90%", 
+                                          height = "300px"))))
         )),
     
     ### PANEL 2B: 2 CONS 1 PULSED RES
@@ -83,7 +102,8 @@ ui <- navbarPage("Modelling Resource Competition",
                              min = 2,
                              max = 100,
                              value = 50)),
-               # Specify rescomp graph to use 
+               
+               # figures to include on this panel 
                mainPanel(h3("Functional response plot"),
                          fluidRow(column(12,align = "center",
                                          plotOutput("FuncResp3", 
@@ -132,6 +152,8 @@ ui <- navbarPage("Modelling Resource Competition",
                              max = 2,
                              value = 0.2),
                  ),
+               
+               # figures to include on this panel
              mainPanel(h3("Functional response plots"),
                        h5("This plot is used to identify R*. Use this 
                           plot to determine the outcome: will species coexist,
@@ -154,7 +176,23 @@ ui <- navbarPage("Modelling Resource Competition",
 #---------------------------------------------------------------------
 server <- function(input, output) {
   
-    ## One consumer, one resource 
+    ## One consumer, one resource
+  output$FuncResp1 <- renderPlot({
+    pars <- spec_rescomp(
+      spnum = 1, 
+      resnum = 1,
+      funcresp = "type2",
+      mumatrix = matrix(input$mu),
+      resspeed = 0.03,
+      resconc = input$resconc,
+      totaltime = 300)
+    plot_funcresp(pars, maxx = 1) + 
+      theme(text = element_text(size = 22),
+            axis.title = element_text(size = 18),
+            axis.text = element_text(size = 15),
+            legend.text = element_text(size = 18),
+            legend.position = "bottom")
+  })
     output$OneConOneRes <- renderPlot({
       #simulate based on input params from UI
       pars <- spec_rescomp(
@@ -177,6 +215,25 @@ server <- function(input, output) {
     })
 #################################################
     ## Two consumers, one resource 
+    output$FuncResp2 <- renderPlot({
+      pars <- spec_rescomp(
+        spnum = 2, 
+        resnum = 1,
+        funcresp = "type2",
+        mumatrix = matrix(c(input$mu21,input$mu22), 
+                          nrow = 2, 
+                          ncol = 1,
+                          byrow = TRUE),  
+        resspeed = 0.03, 
+        resconc = input$resconc2,
+        totaltime = 500)
+      plot_funcresp(pars, maxx = 1) + 
+        theme(text = element_text(size = 22),
+              axis.title = element_text(size = 18),
+              axis.text = element_text(size = 15),
+              legend.text = element_text(size = 18),
+              legend.position = "bottom")
+    })
     output$TwoConOneRes <- renderPlot({
       #simulate based on input params from UI
       pars <- spec_rescomp(

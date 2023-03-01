@@ -17,6 +17,8 @@ pars <- spec_rescomp(
   resconc = 2,
   totaltime = 300
 )
+
+plot_funcresp(pars, maxx = 1)
 m1 <- sim_rescomp(pars)
 plot_rescomp(m1)
 
