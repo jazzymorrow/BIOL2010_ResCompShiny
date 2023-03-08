@@ -182,6 +182,11 @@ ui <- navbarPage("Modelling Resource Competition",
                              min = 0.2,
                              max = 2,
                              value = 0.2),
+                 sliderInput("time4",
+                             "Simulation time:",
+                             min = 100,
+                             max = 1000,
+                             value = 500)
                  ),
                
                # figures to include on this panel
@@ -395,7 +400,7 @@ server <- function(input, output) {
         #both resources have same concentration??
         mort = 0.03,
         essential = FALSE,
-        totaltime = 500)
+        totaltime = input$time4)
       
       # functional response plot 
       plot_funcresp(pars, maxx = 1) + 
@@ -421,7 +426,7 @@ server <- function(input, output) {
       resconc = input$resconc4, 
       mort = 0.03,
       essential = FALSE,
-      totaltime = 500)
+      totaltime = input$time4)
     
     m1 <- sim_rescomp(pars)
     
