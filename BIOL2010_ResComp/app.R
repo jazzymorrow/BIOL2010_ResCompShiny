@@ -35,7 +35,12 @@ ui <- navbarPage("Modelling Resource Competition",
                              "Resource concentration:",
                              min = 0.1,
                              max = 1,
-                             value = 0.5)),
+                             value = 0.5),
+                 sliderInput("mort1",
+                             "Mortality rate:",
+                             min = 0.01,
+                             max = 0.3,
+                             value = 0.03)),
                
                # figures to include on this panel 
                mainPanel(h3("Functional response plots"),
@@ -84,7 +89,12 @@ ui <- navbarPage("Modelling Resource Competition",
                              "Resource concentration:",
                              min = 0.1,
                              max = 1,
-                             value = 0.5)),
+                             value = 0.5),
+                 sliderInput("mort2", #mortality rate
+                             "Mortality rate:",
+                             min = 0.01,
+                             max = 0.3,
+                             value = 0.03)),
                
                # figures to include on this panel
              mainPanel(h3("Functional response plots"),
@@ -102,6 +112,7 @@ ui <- navbarPage("Modelling Resource Competition",
         )),
     
     ### PANEL 2B: 2 CONS 1 PULSED RES ----
+    #parameters labelled with 3 as this is 3rd scenario
     tabPanel(title = "Pulsed Resource", fluid = TRUE,
              # Sidebar with a slider inputs 
              sidebarLayout(
@@ -130,7 +141,12 @@ ui <- navbarPage("Modelling Resource Competition",
                              "Pulse interval size:",
                              min = 50,
                              max = 150,
-                             value = 50)),
+                             value = 50),
+                 sliderInput("mort3", #mortality rate
+                             "Mortality rate:",
+                             min = 0.01,
+                             max = 0.3,
+                             value = 0.03)),
                
                # figures to include on this panel 
                mainPanel(h3("Functional response plot"),
@@ -149,6 +165,7 @@ ui <- navbarPage("Modelling Resource Competition",
     
     
     ## PANEL 3: 2 CONS 2 RES ----
+    #parameters labelled with 4 as this is 4th scenario
     tabPanel(title = "Two Consumers, Two Resources", 
              # Sidebar with a slider inputs 
              sidebarLayout(
@@ -182,6 +199,11 @@ ui <- navbarPage("Modelling Resource Competition",
                              min = 0.2,
                              max = 2,
                              value = 0.2),
+                 sliderInput("mort4", #mortality rate
+                             "Mortality rate:",
+                             min = 0.01,
+                             max = 0.3,
+                             value = 0.03),
                  sliderInput("time4",
                              "Simulation time:",
                              min = 100,
@@ -225,6 +247,7 @@ server <- function(input, output) {
       kmatrix = matrix(input$halfsat),
       resspeed = 0.03,
       resconc = input$resconc,
+      mort = input$mort1,
       totaltime = 300)
     
     plot_funcresp(pars, maxx = 1) + 
@@ -246,6 +269,7 @@ server <- function(input, output) {
         kmatrix = matrix(input$halfsat),
         resspeed = 0.03,
         resconc = input$resconc,
+        mort = input$mort1,
         totaltime = 300)
       
       m1 <- sim_rescomp(pars)
@@ -277,6 +301,7 @@ server <- function(input, output) {
                          byrow = TRUE),
         resspeed = 0.03, 
         resconc = input$resconc2,
+        mort = input$mort2,
         totaltime = 500)
       
       # functional response plot 
@@ -307,6 +332,7 @@ server <- function(input, output) {
                          byrow = TRUE), 
         resspeed = 0.03, 
         resconc = input$resconc2,
+        mort = input$mort2,
         totaltime = 500)
       
       m1 <- sim_rescomp(pars)
@@ -340,8 +366,9 @@ server <- function(input, output) {
         resspeed = 0, # set to zero for no additional resource supply 
         resconc = 0.2,
         respulse = 0.3,
-        pulsefreq = input$pulsefreq # resource pulse size
-        )
+        pulsefreq = input$pulsefreq, # resource pulse size
+        mort = input$mort3)
+      
       # plot functional responses 
       plot_funcresp(pars, maxx = 1) + 
         theme(text = element_text(size = 22),
@@ -368,8 +395,8 @@ server <- function(input, output) {
         resspeed = 0, # set to zero for no additional resource supply 
         resconc = 0.2,
         respulse = 0.3,
-        pulsefreq = input$pulsefreq # resource pulse size
-      )
+        pulsefreq = input$pulsefreq, # resource pulse size
+        mort = input$mort3)
       
       m1 <- sim_rescomp(pars)
       
@@ -398,7 +425,7 @@ server <- function(input, output) {
         resspeed = 0.03,
         resconc = input$resconc4, 
         #both resources have same concentration??
-        mort = 0.03,
+        mort = input$mort4,
         essential = FALSE,
         totaltime = input$time4)
       
@@ -424,7 +451,7 @@ server <- function(input, output) {
                         byrow = TRUE),
       resspeed = 0.03,
       resconc = input$resconc4, 
-      mort = 0.03,
+      mort = input$mort4,
       essential = FALSE,
       totaltime = input$time4)
     
