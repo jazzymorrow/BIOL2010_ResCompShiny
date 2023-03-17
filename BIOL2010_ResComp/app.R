@@ -40,7 +40,12 @@ ui <- navbarPage("Modelling Resource Competition",
                              "Mortality rate:",
                              min = 0.01,
                              max = 0.3,
-                             value = 0.03)),
+                             value = 0.03),
+                 sliderInput("time1",
+                             "Simulation time:",
+                             min = 100,
+                             max = 1000,
+                             value = 300)),
                
                # figures to include on this panel 
                mainPanel(h3("Functional response plots"),
@@ -60,6 +65,7 @@ ui <- navbarPage("Modelling Resource Competition",
     ## PANEL 2: 2 CONS 1 RES ----
     # navbar menu to give drop-down options for cts or pulsed resourse 
     navbarMenu("Two Consumers, One Resource",
+               
     ### PANEL 2A: 2 CONS 1 RES CTS ----
     tabPanel(title = "Continuously Supplied Resource", fluid = TRUE,
              # Sidebar with a slider inputs 
@@ -94,7 +100,12 @@ ui <- navbarPage("Modelling Resource Competition",
                              "Mortality rate:",
                              min = 0.01,
                              max = 0.3,
-                             value = 0.03)),
+                             value = 0.03),
+                 sliderInput("time2",
+                             "Simulation time:",
+                             min = 100,
+                             max = 2000,
+                             value = 500)),
                
                # figures to include on this panel
              mainPanel(h3("Functional response plots"),
@@ -146,7 +157,12 @@ ui <- navbarPage("Modelling Resource Competition",
                              "Mortality rate:",
                              min = 0.01,
                              max = 0.3,
-                             value = 0.03)),
+                             value = 0.03),
+                 sliderInput("time3",
+                             "Simulation time:",
+                             min = 100,
+                             max = 2000,
+                             value = 500)),
                
                # figures to include on this panel 
                mainPanel(h3("Functional response plot"),
@@ -207,7 +223,7 @@ ui <- navbarPage("Modelling Resource Competition",
                  sliderInput("time4",
                              "Simulation time:",
                              min = 100,
-                             max = 1000,
+                             max = 2000,
                              value = 500)
                  ),
                
@@ -248,7 +264,7 @@ server <- function(input, output) {
       resspeed = 0.03,
       resconc = input$resconc,
       mort = input$mort1,
-      totaltime = 300)
+      totaltime = input$time1)
     
     plot_funcresp(pars, maxx = 1) + 
       theme(text = element_text(size = 22),
@@ -270,7 +286,7 @@ server <- function(input, output) {
         resspeed = 0.03,
         resconc = input$resconc,
         mort = input$mort1,
-        totaltime = 300)
+        totaltime = input$time1)
       
       m1 <- sim_rescomp(pars)
       
@@ -302,7 +318,7 @@ server <- function(input, output) {
         resspeed = 0.03, 
         resconc = input$resconc2,
         mort = input$mort2,
-        totaltime = 500)
+        totaltime = input$time2)
       
       # functional response plot 
       plot_funcresp(pars, maxx = 1) + 
@@ -333,7 +349,7 @@ server <- function(input, output) {
         resspeed = 0.03, 
         resconc = input$resconc2,
         mort = input$mort2,
-        totaltime = 500)
+        totaltime = input$time2)
       
       m1 <- sim_rescomp(pars)
       
@@ -366,6 +382,7 @@ server <- function(input, output) {
         resspeed = 0, # set to zero for no additional resource supply 
         resconc = 0.2,
         respulse = 0.3,
+        totaltime = input$time3,
         pulsefreq = input$pulsefreq, # resource pulse size
         mort = input$mort3)
       
@@ -395,6 +412,7 @@ server <- function(input, output) {
         resspeed = 0, # set to zero for no additional resource supply 
         resconc = 0.2,
         respulse = 0.3,
+        totaltime = input$time3,
         pulsefreq = input$pulsefreq, # resource pulse size
         mort = input$mort3)
       
