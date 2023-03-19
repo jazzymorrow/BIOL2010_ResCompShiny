@@ -10,6 +10,7 @@
 library(shiny)
 library(rescomp)
 library(ggplot2)
+library(patchwork)
 
 
 # UI for application ----
@@ -52,18 +53,12 @@ ui <- navbarPage("Modelling Resource Competition",
                              value = 300,
                              step = 200)),
                
-               # figures to include on this panel 
-               mainPanel(h3("Functional response plots"),
-                 fluidRow(column(12,align = "center",
-                                         plotOutput(
-                                           "FuncResp1",
-                                           width = "70%",
-                                           height = "300px"))),
-                 h3("Population and resources through time"),
+               # figure to include on this panel 
+               mainPanel(
                  fluidRow(column(12,align = "center",
                                  plotOutput("OneConOneRes", 
-                                            width = "90%", 
-                                            height = "300px"))))
+                                            width = "85%", 
+                                            height = "700px"))))
              )),
     
     
@@ -119,19 +114,13 @@ ui <- navbarPage("Modelling Resource Competition",
                              value = 500,
                              step = 200)),
                
-               # figures to include on this panel
-             mainPanel(h3("Functional response plots"),
-                       fluidRow(
-                         column(12,align = "center",
-                                plotOutput("FuncResp2", 
-                                          width = "70%", 
-                                          height = "300px"))),
-               h3("Population and resources through time"),
+               # figure to include on this panel
+             mainPanel(
                fluidRow(
                  column(12,align = "center",
                         plotOutput("TwoConOneRes",
                                    width = "90%", 
-                                   height = "300px"))))
+                                   height = "700px"))))
         )),
     
     ### PANEL 2B: 2 CONS 1 PULSED RES ----
@@ -183,18 +172,17 @@ ui <- navbarPage("Modelling Resource Competition",
                              step = 200)),
                
                # figures to include on this panel 
-               mainPanel(h3("Functional response plot"),
-                         fluidRow(
-                           column(12,align = "center",
-                                  plotOutput("FuncResp3", 
-                                            width = "70%",
-                                            height = "300px"))),
-                         h3("Population and resources through time"),
+               mainPanel(
+                         # fluidRow(
+                         #   column(12,align = "center",
+                         #          plotOutput("FuncResp3", 
+                         #                    width = "70%",
+                         #                    height = "300px"))),
                          fluidRow(
                            column(12,align = "center",
                                   plotOutput("TwoConOnePulRes",
                                              width = "90%",
-                                             height = "300px"))))
+                                             height = "700px"))))
         ))),
     
     
@@ -258,19 +246,16 @@ ui <- navbarPage("Modelling Resource Competition",
                              step = 200)
                  ),
                
-               # figures to include on this panel
-             mainPanel(h3("Functional response plots"),
+               # figure to include on this panel
+             mainPanel(
                        h5("This plot is used to identify R*. 
                           Use this plot to determine the outcome: 
                           will species coexist,or will one 
                           species exclude the other?"),
                fluidRow(column(12,align = "center",
-                        plotOutput("FuncResp4", 
-                                      width = "80%", 
-                                   height = "300px"))),
-               h3("Population and resources through time"),
-               fluidRow(column(12,align = "center",
-                               plotOutput("TwoConTwoRes")))
+                               plotOutput("TwoConTwoRes",
+                                          width = "85%",
+                                          height = "700px")))
       )))
 )
 
@@ -282,30 +267,30 @@ ui <- navbarPage("Modelling Resource Competition",
 
 server <- function(input, output) {
   
+  
+  # output$FuncResp1 <- renderPlot({
+  #   pars <- spec_rescomp(
+  #     spnum = 1, 
+  #     resnum = 1,
+  #     funcresp = "type2",
+  #     mumatrix = matrix(input$mu),
+  #     kmatrix = matrix(input$halfsat),
+  #     resspeed = 0.03,
+  #     resconc = input$resconc,
+  #     mort = input$mort1,
+  #     totaltime = input$time1)
+  #   
+  #   plot_funcresp(pars, maxx = 1) + 
+  #     theme(text = element_text(size = 22),
+  #           axis.title = element_text(size = 18),
+  #           axis.text = element_text(size = 15),
+  #           legend.text = element_text(size = 18),
+  #           legend.position = "bottom")
+  # })
+  
+  
   ## 1 CONS 1 RES ----
-  
-  # FUNCTIONAL RESPONSE PLOT
-  output$FuncResp1 <- renderPlot({
-    pars <- spec_rescomp(
-      spnum = 1, 
-      resnum = 1,
-      funcresp = "type2",
-      mumatrix = matrix(input$mu),
-      kmatrix = matrix(input$halfsat),
-      resspeed = 0.03,
-      resconc = input$resconc,
-      mort = input$mort1,
-      totaltime = input$time1)
     
-    plot_funcresp(pars, maxx = 1) + 
-      theme(text = element_text(size = 22),
-            axis.title = element_text(size = 18),
-            axis.text = element_text(size = 15),
-            legend.text = element_text(size = 18),
-            legend.position = "bottom")
-  })
-  
-    # PLOT THROUGH TIME
     output$OneConOneRes <- renderPlot({
       #simulate based on input params from UI
       pars <- spec_rescomp(
@@ -321,44 +306,58 @@ server <- function(input, output) {
       
       m1 <- sim_rescomp(pars)
       
-      # plot results through time 
-      plot_rescomp(m1) + theme(text = element_text(size=22),
-                               axis.title = element_text(size = 18),
-                               axis.text = element_text(size = 15),
-                               legend.text = element_text(size = 18),
-                               legend.position = "bottom")
-    })
-    
-
-    ## 2 CONS 1 CTS RES ----
-    # FUNCTIONAL RESPONSE PLOT
-    output$FuncResp2 <- renderPlot({
-      # specify rescomp parameters 
-      pars <- spec_rescomp(
-        spnum = 2, 
-        resnum = 1,
-        funcresp = "type2",
-        mumatrix = matrix(c(input$mu21,input$mu22), 
-                          nrow = 2, 
-                          ncol = 1,
-                          byrow = TRUE), 
-        kmatrix = matrix(c(input$halfsat21, input$halfsat22),
-                         nrow = 2,
-                         ncol = 1,
-                         byrow = TRUE),
-        resspeed = 0.03, 
-        resconc = input$resconc2,
-        mort = input$mort2,
-        totaltime = input$time2)
-      
-      # functional response plot 
-      plot_funcresp(pars, maxx = 1) + 
+      # FUNCTIONAL RESPONSE PLOT
+      p1 <- plot_funcresp(pars, maxx = 1) + 
         theme(text = element_text(size = 22),
               axis.title = element_text(size = 18),
               axis.text = element_text(size = 15),
               legend.text = element_text(size = 18),
-              legend.position = "bottom")
+              legend.position = "bottom") +
+        ggtitle("Functional response plot")
+      
+      # PLOT THROUGH TIME 
+      p2 <- plot_rescomp(m1) + theme(text = element_text(size=22),
+                               axis.title = element_text(size = 18),
+                               axis.text = element_text(size = 15),
+                               legend.text = element_text(size = 18),
+                               legend.position = "bottom") +
+        ggtitle("Population & resources through time")
+      
+      # RETURN BOTH PLOTS STACKED
+      p1 / p2
     })
+    
+
+    ## 2 CONS 1 CTS RES ----
+    
+    
+    # output$FuncResp2 <- renderPlot({
+    #   # specify rescomp parameters 
+    #   pars <- spec_rescomp(
+    #     spnum = 2, 
+    #     resnum = 1,
+    #     funcresp = "type2",
+    #     mumatrix = matrix(c(input$mu21,input$mu22), 
+    #                       nrow = 2, 
+    #                       ncol = 1,
+    #                       byrow = TRUE), 
+    #     kmatrix = matrix(c(input$halfsat21, input$halfsat22),
+    #                      nrow = 2,
+    #                      ncol = 1,
+    #                      byrow = TRUE),
+    #     resspeed = 0.03, 
+    #     resconc = input$resconc2,
+    #     mort = input$mort2,
+    #     totaltime = input$time2)
+    #   
+    #   # functional response plot 
+    #   plot_funcresp(pars, maxx = 1) + 
+    #     theme(text = element_text(size = 22),
+    #           axis.title = element_text(size = 18),
+    #           axis.text = element_text(size = 15),
+    #           legend.text = element_text(size = 18),
+    #           legend.position = "bottom")
+    # })
     
     #PLOT THROUGH TIME
     output$TwoConOneRes <- renderPlot({
@@ -384,47 +383,62 @@ server <- function(input, output) {
       
       m1 <- sim_rescomp(pars)
       
-      # plot results through time 
-      plot_rescomp(m1) + 
+      
+      # FUNCTIONAL RESPONSE PLOT
+      p1 <- plot_funcresp(pars, maxx = 1) + 
+        theme(text = element_text(size = 22),
+              axis.title = element_text(size = 18),
+              axis.text = element_text(size = 15),
+              legend.text = element_text(size = 18),
+              legend.position = "bottom") +
+        ggtitle("Functional response plots")
+      
+      # PLOT THROUGH TIME 
+      p2 <- plot_rescomp(m1) + 
         theme(text = element_text(size=22),
               axis.title = element_text(size = 18),
               axis.text = element_text(size = 15),
               legend.text = element_text(size = 18),
-              legend.position = "bottom")
+              legend.position = "bottom") +
+        ggtitle("Population & resources through time")
+      
+      # RETURN BOTH PLOTS STACKED
+      p1 / p2
     })
     
     
    
     ## 2 CONS 1 PULSED RES ----
-    # FUNCTIONAL RESPONSE PLOT
-    output$FuncResp3 <- renderPlot({
-      pars <- spec_rescomp(
-        spnum = 2, 
-        resnum = 1,
-        funcresp = "type2",
-        mumatrix = matrix(c(input$mu31,input$mu32), 
-                          nrow = 2, 
-                          ncol = 1,
-                          byrow = TRUE),
-        kmatrix = matrix(c(input$halfsat31, input$halfsat32), 
-                         nrow = 2, 
-                         ncol = 1, 
-                         byrow = TRUE),  
-        resspeed = 0, # set to zero for no additional resource supply 
-        resconc = 0.2,
-        respulse = 0.3,
-        totaltime = input$time3,
-        pulsefreq = input$pulsefreq, # resource pulse size
-        mort = input$mort3)
-      
-      # plot functional responses 
-      plot_funcresp(pars, maxx = 1) + 
-        theme(text = element_text(size = 22),
-              axis.title = element_text(size = 18),
-              axis.text = element_text(size = 15),
-              legend.text = element_text(size = 18),
-              legend.position = "bottom")
-    })
+
+    
+    # output$FuncResp3 <- renderPlot({
+    #   pars <- spec_rescomp(
+    #     spnum = 2, 
+    #     resnum = 1,
+    #     funcresp = "type2",
+    #     mumatrix = matrix(c(input$mu31,input$mu32), 
+    #                       nrow = 2, 
+    #                       ncol = 1,
+    #                       byrow = TRUE),
+    #     kmatrix = matrix(c(input$halfsat31, input$halfsat32), 
+    #                      nrow = 2, 
+    #                      ncol = 1, 
+    #                      byrow = TRUE),  
+    #     resspeed = 0, # set to zero for no additional resource supply 
+    #     resconc = 0.2,
+    #     respulse = 0.3,
+    #     totaltime = input$time3,
+    #     pulsefreq = input$pulsefreq, # resource pulse size
+    #     mort = input$mort3)
+    #   
+    #   # plot functional responses 
+    #   plot_funcresp(pars, maxx = 1) + 
+    #     theme(text = element_text(size = 22),
+    #           axis.title = element_text(size = 18),
+    #           axis.text = element_text(size = 15),
+    #           legend.text = element_text(size = 18),
+    #           legend.position = "bottom")
+    # })
 
     #PLOT THROUGH TIME
     output$TwoConOnePulRes <- renderPlot({
@@ -449,42 +463,55 @@ server <- function(input, output) {
       
       m1 <- sim_rescomp(pars)
       
-      # plot outcome through time 
-      plot_rescomp(m1) + 
-        theme(text = element_text(size=22),
-              axis.title = element_text(size = 18),
-              axis.text = element_text(size = 15),
-              legend.text = element_text(size = 18),
-              legend.position = "bottom")
-    })
-
-       
-    ## 2 CONS 2 RES ----
-    #FUNCTIONAL RESPONSE PLOT
-    output$FuncResp4 <- renderPlot({
-      pars <- spec_rescomp(
-        spnum = 2, 
-        resnum = 2,
-        funcresp = "type2",
-        mumatrix = matrix(c(input$mu41A,input$mu41B,
-                            input$mu42A, input$mu42B), 
-                          nrow = 2, 
-                          ncol = 2,
-                          byrow = TRUE),
-        resspeed = 0.03,
-        resconc = c(input$resconc4A,input$resconc4B),
-        mort = input$mort4,
-        essential = FALSE,
-        totaltime = input$time4)
-      
-      # functional response plot 
-      plot_funcresp(pars, maxx = 1) + 
+      # FUNCTIONAL RESPONSE PLOT
+      p1 <- plot_funcresp(pars, maxx = 1) + 
         theme(text = element_text(size = 22),
               axis.title = element_text(size = 18),
               axis.text = element_text(size = 15),
               legend.text = element_text(size = 18),
-              legend.position = "bottom")
+              legend.position = "bottom") +
+        ggtitle("Functional response plots")
+      
+      # PLOT THROUGH TIME  
+      p2 <- plot_rescomp(m1) + 
+        theme(text = element_text(size=22),
+              axis.title = element_text(size = 18),
+              axis.text = element_text(size = 15),
+              legend.text = element_text(size = 18),
+              legend.position = "bottom") +
+        ggtitle("Population & resources through time")
+      
+      # RETURN BOTH PLOTS STACKED
+      p1 / p2
     })
+
+       
+    ## 2 CONS 2 RES ----
+
+    # output$FuncResp4 <- renderPlot({
+    #   pars <- spec_rescomp(
+    #     spnum = 2, 
+    #     resnum = 2,
+    #     funcresp = "type2",
+    #     mumatrix = matrix(c(input$mu41A,input$mu41B,
+    #                         input$mu42A, input$mu42B), 
+    #                       nrow = 2, 
+    #                       ncol = 2,
+    #                       byrow = TRUE),
+    #     resspeed = 0.03,
+    #     resconc = c(input$resconc4A,input$resconc4B),
+    #     mort = input$mort4,
+    #     essential = FALSE,
+    #     totaltime = input$time4)
+    #   
+    #   # functional response plot 
+    #   plot_funcresp(pars, maxx = 1) + 
+    #     theme(text = element_text(size = 22),
+    #           axis.title = element_text(size = 18),
+    #           axis.text = element_text(size = 15),
+    #           legend.text = element_text(size = 18),
+    #           legend.position = "bottom")
+    # })
     
     #PLOT THROUGH TIME
     output$TwoConTwoRes <- renderPlot({
@@ -505,12 +532,26 @@ server <- function(input, output) {
     
     m1 <- sim_rescomp(pars)
     
-    plot_rescomp(m1) + 
+    #FUNCTIONAL RESPONSE PLOTS
+    p1 <- plot_funcresp(pars, maxx = 1) + 
       theme(text = element_text(size = 22),
             axis.title = element_text(size = 18),
             axis.text = element_text(size = 15),
             legend.text = element_text(size = 18),
-            legend.position = "bottom")
+            legend.position = "bottom") +
+      ggtitle("Functional response plots")
+    
+    #PLOT THROOUGH TIME
+    p2 <- plot_rescomp(m1) + 
+      theme(text = element_text(size = 22),
+            axis.title = element_text(size = 18),
+            axis.text = element_text(size = 15),
+            legend.text = element_text(size = 18),
+            legend.position = "bottom") +
+      ggtitle("Population & resources through time")
+    
+    # RETURN BOTH PLOTS STACKED
+    p1 / p2
     })
      
 }
