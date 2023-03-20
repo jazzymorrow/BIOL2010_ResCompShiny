@@ -156,7 +156,7 @@ ui <- navbarPage("Modelling Resource Competition",
                  sliderInput("pulsefreq",
                              "Pulse interval size:",
                              min = 1,
-                             max = 80,
+                             max = 60,
                              value = 50,
                              step = 5),
                  sliderInput("mort3", #mortality rate
@@ -248,10 +248,6 @@ ui <- navbarPage("Modelling Resource Competition",
                
                # figure to include on this panel
              mainPanel(
-                       h5("This plot is used to identify R*. 
-                          Use this plot to determine the outcome: 
-                          will species coexist,or will one 
-                          species exclude the other?"),
                fluidRow(column(12,align = "center",
                                plotOutput("TwoConTwoRes",
                                           width = "85%",
